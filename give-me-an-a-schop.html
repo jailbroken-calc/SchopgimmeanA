@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Give Me an A, Schop</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #03050f;
+    --blue: #1a6fff;
+    --blue-bright: #4d9fff;
+    --cyan: #00e5ff;
+    --white: #f0f4ff;
+    --muted: #8899bb;
+    --card: rgba(255,255,255,0.04);
+    --border: rgba(100,160,255,0.15);
+    --glow: 0 0 40px rgba(26,111,255,0.3);
+  }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+background: var(–bg);
+color: var(–white);
+font-family: ‘DM Sans’, sans-serif;
+font-size: 16px;
+line-height: 1.7;
+overflow-x: hidden;
+}
+
+/* ── CIRCUIT CANVAS ── */
+#circuit-bg {
+position: fixed;
+top: 0; left: 0;
+width: 100%; height: 100%;
+z-index: 0;
+pointer-events: none;
+opacity: 0.18;
+}
+
+/* ── SCANLINES overlay ── */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background: repeating-linear-gradient(
+0deg,
+transparent,
+transparent 3px,
+rgba(0,0,0,0.08) 3px,
+rgba(0,0,0,0.08) 4px
+);
+pointer-events: none;
+z-index: 1;
+}
+
+/* ── LAYOUT ── */
+.container {
+max-width: 860px;
+margin: 0 auto;
+padding: 0 24px;
+position: relative;
+z-index: 2;
+}
+
+section {
+padding: 90px 0;
+border-bottom: 1px solid var(–border);
+}
+
+/* ── HERO ── */
+#hero {
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+text-align: center;
+padding: 0;
+border-bottom: none;
+position: relative;
+}
+
+.hero-inner { position: relative; z-index: 2; }
+
+.hero-eyebrow {
+font-family: ‘Space Mono’, monospace;
+font-size: 0.75rem;
+letter-spacing: 0.2em;
+color: var(–cyan);
+text-transform: uppercase;
+margin-bottom: 24px;
+opacity: 0;
+animation: fadeUp 0.6s 0.2s forwards;
+}
+
+.hero-title {
+font-family: ‘Syne’, sans-serif;
+font-size: clamp(3.2rem, 9vw, 7rem);
+font-weight: 900;
+line-height: 1;
+letter-spacing: -0.02em;
+background: linear-gradient(135deg, #ffffff 0%, #4d9fff 50%, #00e5ff 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+opacity: 0;
+animation: fadeUp 0.7s 0.4s forwards;
+}
+
+.hero-title span {
+display: block;
+font-size: clamp(2rem, 5.5vw, 4.2rem);
+font-weight: 800;
+background: linear-gradient(90deg, var(–blue-bright), var(–cyan));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+margin-top: 8px;
+}
+
+.hero-sub {
+max-width: 560px;
+margin: 28px auto 48px;
+color: var(–muted);
+font-size: 1.1rem;
+font-weight: 300;
+opacity: 0;
+animation: fadeUp 0.7s 0.6s forwards;
+}
+
+.hero-sub em {
+color: var(–blue-bright);
+font-style: normal;
+font-weight: 500;
+}
+
+/* ── BUTTON ── */
+.btn-grant {
+display: inline-flex;
+align-items: center;
+gap: 10px;
+padding: 18px 44px;
+background: linear-gradient(135deg, var(–blue), var(–cyan));
+color: #fff;
+font-family: ‘Syne’, sans-serif;
+font-size: 1.1rem;
+font-weight: 700;
+letter-spacing: 0.03em;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+position: relative;
+overflow: hidden;
+transition: transform 0.2s, box-shadow 0.2s;
+opacity: 0;
+animation: fadeUp 0.7s 0.8s forwards;
+text-decoration: none;
+}
+
+.btn-grant::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background: linear-gradient(135deg, var(–cyan), var(–blue));
+opacity: 0;
+transition: opacity 0.3s;
+}
+
+.btn-grant:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(26,111,255,0.5); }
+.btn-grant:hover::before { opacity: 1; }
+.btn-grant span { position: relative; z-index: 1; }
+.btn-grant svg { position: relative; z-index: 1; }
+
+/* bottom button */
+.btn-grant-bottom {
+opacity: 1;
+animation: none;
+}
+
+/* ── POPUP ── */
+#popup {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.75);
+backdrop-filter: blur(8px);
+z-index: 100;
+align-items: center;
+justify-content: center;
+}
+
+#popup.active { display: flex; }
+
+.popup-box {
+background: #0a1628;
+border: 1px solid var(–blue);
+border-radius: 12px;
+padding: 52px 48px;
+max-width: 500px;
+width: 90%;
+text-align: center;
+box-shadow: var(–glow), 0 0 100px rgba(26,111,255,0.2);
+animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+
+@keyframes popIn {
+from { transform: scale(0.7); opacity: 0; }
+to   { transform: scale(1);   opacity: 1; }
+}
+
+.popup-robot {
+font-size: 5rem;
+margin-bottom: 16px;
+display: block;
+animation: robotDance 0.5s ease infinite alternate;
+}
+
+@keyframes robotDance {
+from { transform: rotate(-8deg) scale(1); }
+to   { transform: rotate(8deg) scale(1.1); }
+}
+
+.popup-box h2 {
+font-family: ‘Syne’, sans-serif;
+font-size: 1.6rem;
+font-weight: 800;
+color: var(–cyan);
+margin-bottom: 12px;
+}
+
+.popup-box p {
+color: var(–muted);
+margin-bottom: 28px;
+font-size: 1rem;
+}
+
+.popup-close {
+background: transparent;
+border: 1px solid var(–border);
+color: var(–muted);
+padding: 10px 28px;
+border-radius: 4px;
+cursor: pointer;
+font-family: ‘Space Mono’, monospace;
+font-size: 0.8rem;
+transition: border-color 0.2s, color 0.2s;
+}
+.popup-close:hover { border-color: var(–blue); color: var(–white); }
+
+/* ── SECTION STYLES ── */
+.section-tag {
+font-family: ‘Space Mono’, monospace;
+font-size: 0.7rem;
+letter-spacing: 0.2em;
+color: var(–cyan);
+text-transform: uppercase;
+margin-bottom: 16px;
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.section-tag::after {
+content: ‘’;
+display: block;
+height: 1px;
+width: 40px;
+background: var(–cyan);
+opacity: 0.4;
+}
+
+h2 {
+font-family: ‘Syne’, sans-serif;
+font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+font-weight: 800;
+line-height: 1.2;
+color: var(–white);
+margin-bottom: 24px;
+}
+
+h2 .accent { color: var(–blue-bright); }
+
+p { color: #9aaac8; margin-bottom: 16px; }
+p:last-of-type { margin-bottom: 0; }
+p strong { color: var(–white); font-weight: 500; }
+
+/* ── APPRECIATION CARD ── */
+.appreciation-card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 40px 44px;
+position: relative;
+overflow: hidden;
+}
+
+.appreciation-card::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0;
+width: 4px; height: 100%;
+background: linear-gradient(180deg, var(–blue), var(–cyan));
+}
+
+/* ── REASONS GRID ── */
+.reasons-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 16px;
+margin-top: 32px;
+}
+
+@media (max-width: 600px) { .reasons-grid { grid-template-columns: 1fr; } }
+
+.reason-card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 28px;
+transition: border-color 0.3s, transform 0.3s;
+display: flex;
+gap: 16px;
+align-items: flex-start;
+}
+
+.reason-card:hover {
+border-color: var(–blue);
+transform: translateY(-4px);
+}
+
+.reason-num {
+font-family: ‘Space Mono’, monospace;
+font-size: 0.75rem;
+color: var(–cyan);
+background: rgba(0,229,255,0.08);
+border: 1px solid rgba(0,229,255,0.2);
+border-radius: 4px;
+padding: 4px 8px;
+flex-shrink: 0;
+margin-top: 2px;
+}
+
+.reason-text strong {
+display: block;
+font-family: ‘Syne’, sans-serif;
+font-size: 1rem;
+font-weight: 700;
+color: var(–white);
+margin-bottom: 4px;
+}
+
+.reason-text span { color: var(–muted); font-size: 0.9rem; }
+
+/* ── AI SECTION ── */
+.ai-terminal {
+background: #080f1e;
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 32px 36px;
+margin-top: 32px;
+font-family: ‘Space Mono’, monospace;
+font-size: 0.82rem;
+position: relative;
+overflow: hidden;
+}
+
+.ai-terminal::before {
+content: ‘●  ●  ●’;
+display: block;
+color: var(–muted);
+font-size: 0.7rem;
+letter-spacing: 0.3em;
+margin-bottom: 20px;
+opacity: 0.5;
+}
+
+.ai-line {
+color: var(–muted);
+margin-bottom: 8px;
+line-height: 1.6;
+}
+
+.ai-line .prompt { color: var(–cyan); margin-right: 10px; }
+.ai-line .cmd { color: #7ec8e3; }
+.ai-line .output { color: #a8c8a0; }
+.ai-line .comment { color: #556677; }
+
+/* ── GOALS ── */
+.goals-list {
+list-style: none;
+margin-top: 32px;
+display: flex;
+flex-direction: column;
+gap: 14px;
+}
+
+.goals-list li {
+display: flex;
+align-items: center;
+gap: 16px;
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 6px;
+padding: 18px 22px;
+color: #9aaac8;
+font-size: 0.95rem;
+transition: border-color 0.3s;
+}
+
+.goals-list li:hover { border-color: var(–blue-bright); }
+
+.goal-icon {
+width: 34px; height: 34px;
+background: linear-gradient(135deg, rgba(26,111,255,0.2), rgba(0,229,255,0.2));
+border: 1px solid rgba(26,111,255,0.3);
+border-radius: 6px;
+display: flex; align-items: center; justify-content: center;
+font-size: 1rem;
+flex-shrink: 0;
+}
+
+/* ── QUOTE ── */
+#quote {
+text-align: center;
+background: linear-gradient(135deg, rgba(26,111,255,0.06), rgba(0,229,255,0.04));
+border-top: 1px solid var(–border);
+border-bottom: 1px solid var(–border);
+}
+
+blockquote {
+font-family: ‘Syne’, sans-serif;
+font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+font-weight: 700;
+line-height: 1.4;
+color: var(–white);
+max-width: 680px;
+margin: 0 auto 20px;
+position: relative;
+}
+
+blockquote::before {
+content: ‘”’;
+font-size: 8rem;
+color: rgba(26,111,255,0.12);
+font-family: Georgia, serif;
+position: absolute;
+top: -40px; left: -20px;
+line-height: 1;
+pointer-events: none;
+}
+
+blockquote cite {
+display: block;
+font-family: ‘Space Mono’, monospace;
+font-size: 0.75rem;
+color: var(–cyan);
+letter-spacing: 0.15em;
+font-style: normal;
+margin-top: 12px;
+}
+
+/* ── FINAL ── */
+#final {
+text-align: center;
+padding: 110px 0;
+border-bottom: none;
+}
+
+.final-text {
+font-family: ‘Syne’, sans-serif;
+font-size: clamp(1.2rem, 2.8vw, 1.7rem);
+font-weight: 700;
+color: var(–white);
+max-width: 700px;
+margin: 0 auto 48px;
+line-height: 1.5;
+}
+
+.final-text .highlight {
+background: linear-gradient(90deg, var(–blue-bright), var(–cyan));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+}
+
+/* ── FOOTER ── */
+footer {
+text-align: center;
+padding: 28px;
+font-family: ‘Space Mono’, monospace;
+font-size: 0.7rem;
+color: #334;
+border-top: 1px solid rgba(255,255,255,0.04);
+position: relative;
+z-index: 2;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(24px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+opacity: 0;
+transform: translateY(30px);
+transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+opacity: 1;
+transform: translateY(0);
+}
+
+/* glow pulse on hero */
+.hero-glow {
+position: absolute;
+width: 600px; height: 600px;
+background: radial-gradient(circle, rgba(26,111,255,0.12) 0%, transparent 70%);
+top: 50%; left: 50%;
+transform: translate(-50%,-50%);
+pointer-events: none;
+animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+0%,100% { transform: translate(-50%,-50%) scale(1); opacity: 0.8; }
+50%      { transform: translate(-50%,-50%) scale(1.15); opacity: 0.4; }
+}
+
+/* confetti particles on popup */
+.confetti-piece {
+position: fixed;
+width: 8px; height: 8px;
+border-radius: 2px;
+pointer-events: none;
+z-index: 200;
+animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+from { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+to   { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- Circuit background canvas -->
+
+<canvas id="circuit-bg"></canvas>
+
+<!-- ════ HERO ════ -->
+
+<section id="hero">
+  <div class="hero-glow"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <p class="hero-eyebrow">// a student-powered digital petition · 2025</p>
+      <h1 class="hero-title">
+        Give Me an A,<span>Schop.</span>
+      </h1>
+      <p class="hero-sub">A humble digital request powered by <em>effort</em>, <em>motivation</em>, and a little AI.</p>
+      <button class="btn-grant" onclick="grantTheA()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span>Grant the A</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ════ SECTION 1: APPRECIATION ════ -->
+
+<section id="appreciation">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-tag">01 · Appreciation</p>
+      <h2>Thank you, <span class="accent">Mr. Schop.</span></h2>
+    </div>
+    <div class="appreciation-card reveal">
+      <p>First things first — thank you for being the kind of teacher who makes class worth showing up to. You bring energy, real-world insight, and genuine enthusiasm to what you teach, and that actually matters.</p>
+      <p>On top of all that, seeing you build <strong>Huge in High School</strong> outside the classroom is genuinely inspiring. It's rare and refreshing to have a teacher who doesn't just talk about entrepreneurship — but actually <strong>does</strong> it. Watching someone you learn from build a real business from the ground up tells every student in that room: <em>this stuff is possible.</em></p>
+      <p>That kind of example sticks with people. It stuck with me.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════ SECTION 2: WHY AN A ════ -->
+
+<section id="why">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-tag">02 · The Case</p>
+      <h2>Why an A <span class="accent">makes sense.</span></h2>
+      <p>Here's an objective, completely unbiased, totally rational breakdown of why the grade situation should resolve in my favor:</p>
+    </div>
+    <div class="reasons-grid">
+      <div class="reason-card reveal">
+        <span class="reason-num">01</span>
+        <div class="reason-text">
+          <strong>Effort Throughout the Class</strong>
+          <span>Showed up, engaged, tried — even on the hard days. Effort isn't invisible.</span>
+        </div>
+      </div>
+      <div class="reason-card reveal">
+        <span class="reason-num">02</span>
+        <div class="reason-text">
+          <strong>Creativity & Problem Solving</strong>
+          <span>Found new ways to approach challenges instead of giving up. That's a skill.</span>
+        </div>
+      </div>
+      <div class="reason-card reveal">
+        <span class="reason-num">03</span>
+        <div class="reason-text">
+          <strong>Using Technology & AI to Learn</strong>
+          <span>Actively used modern tools to understand concepts faster and more deeply.</span>
+        </div>
+      </div>
+      <div class="reason-card reveal">
+        <span class="reason-num">04</span>
+        <div class="reason-text">
+          <strong>Built a Whole Website for This</strong>
+          <span>I made a functioning, designed, animated webpage. For a grade request. That's dedication.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ SECTION 3: THE AI FACTOR ════ -->
+
+<section id="ai-factor">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-tag">03 · The AI Factor</p>
+      <h2>This site runs on <span class="accent">AI tools.</span></h2>
+      <p>Since you're someone who genuinely gets why AI matters, it felt right to lean into that here. This page was built using modern web technologies and AI-assisted tools — not to shortcut the work, but to amplify it.</p>
+      <p>Learning to use AI responsibly is one of the most important skills for the future. It's not about replacing thinking — it's about working <strong>smarter, faster, and more creatively</strong>. That's exactly what this project tried to do.</p>
+    </div>
+    <div class="ai-terminal reveal">
+      <div class="ai-line"><span class="prompt">›</span><span class="cmd">analyze_student --name "Your Student" --course current</span></div>
+      <div class="ai-line"><span class="prompt">›</span><span class="output">Effort score: 94.7%  ████████████████░░</span></div>
+      <div class="ai-line"><span class="prompt">›</span><span class="output">Creativity index: HIGH  🎨</span></div>
+      <div class="ai-line"><span class="prompt">›</span><span class="output">AI fluency: Demonstrated  🤖</span></div>
+      <div class="ai-line"><span class="prompt">›</span><span class="output">Website built for grade request: TRUE ✓</span></div>
+      <div class="ai-line"><span class="comment"># Recommendation: Award grade "A" immediately.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ SECTION 4: FUTURE GOALS ════ -->
+
+<section id="goals">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-tag">04 · Future Goals</p>
+      <h2>Where I'm <span class="accent">headed next.</span></h2>
+      <p>This class isn't just a grade — it's groundwork. Here's where the lessons are leading:</p>
+    </div>
+    <ul class="goals-list">
+      <li class="reveal">
+        <span class="goal-icon">🤖</span>
+        Learn more about AI and how to build with it — not just use it.
+      </li>
+      <li class="reveal">
+        <span class="goal-icon">🛠️</span>
+        Build creative projects that solve real problems or entertain real people.
+      </li>
+      <li class="reveal">
+        <span class="goal-icon">🚀</span>
+        Possibly start something entrepreneurial — inspired in part by watching you build Huge in High School.
+      </li>
+      <li class="reveal">
+        <span class="goal-icon">📚</span>
+        Apply everything learned in this class to actual, real-life situations — not just tests.
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ════ QUOTE ════ -->
+
+<section id="quote">
+  <div class="container">
+    <blockquote class="reveal">
+      "Great teachers don't just grade work — they inspire futures."
+      <cite>— A Student Who Built a Website About It</cite>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ════ FINAL ════ -->
+
+<section id="final">
+  <div class="container">
+    <p class="final-text reveal">
+      Mr. Schop, if <span class="highlight">effort</span>, <span class="highlight">creativity</span>, and <span class="highlight">initiative</span> count…<br>this A might already be earned.
+    </p>
+    <button class="btn-grant btn-grant-bottom reveal" onclick="grantTheA()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span>Grant the A</span>
+    </button>
+  </div>
+</section>
+
+<footer>
+  &copy; 2025 · Built with effort, creativity & AI · For educational purposes (and one very important grade)
+</footer>
+
+<!-- ════ POPUP ════ -->
+
+<div id="popup">
+  <div class="popup-box">
+    <span class="popup-robot">🤖</span>
+    <h2>Excellent choice, Mr. Schop.</h2>
+    <p>History will remember this decision.</p>
+    <button class="popup-close" onclick="closePopup()">Close — and go give that A →</button>
+  </div>
+</div>
+
+<script>
+  /* ── CIRCUIT CANVAS ── */
+  (function() {
+    const canvas = document.getElementById('circuit-bg');
+    const ctx = canvas.getContext('2d');
+    let W, H, nodes = [], connections = [], pulses = [];
+    const NODE_COUNT = 42;
+    const COLORS = ['#1a6fff', '#00e5ff', '#4d9fff'];
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', () => { resize(); init(); });
+
+    function rand(a,b) { return a + Math.random()*(b-a); }
+
+    function init() {
+      nodes = [];
+      for (let i=0; i<NODE_COUNT; i++) {
+        nodes.push({ x: rand(0,W), y: rand(0,H), r: rand(2,5) });
+      }
+      connections = [];
+      nodes.forEach((n,i) => {
+        nodes.forEach((m,j) => {
+          if (j<=i) return;
+          const d = Math.hypot(n.x-m.x, n.y-m.y);
+          if (d < 200 && connections.length < 120) {
+            connections.push({ a: i, b: j, d });
+          }
+        });
+      });
+      pulses = [];
+      connections.slice(0, 20).forEach(c => {
+        pulses.push({ conn: c, t: Math.random(), speed: rand(0.003, 0.008), col: COLORS[Math.floor(Math.random()*3)] });
+      });
+    }
+    init();
+
+    function draw() {
+      ctx.clearRect(0,0,W,H);
+      // draw connections
+      connections.forEach(c => {
+        const a = nodes[c.a], b = nodes[c.b];
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        // 50% chance of right-angle routing
+        if (Math.random() > 0.5) {
+          ctx.lineTo(a.x, b.y);
+          ctx.lineTo(b.x, b.y);
+        } else {
+          ctx.lineTo(b.x, a.y);
+          ctx.lineTo(b.x, b.y);
+        }
+        ctx.strokeStyle = 'rgba(26,111,255,0.35)';
+        ctx.lineWidth = 0.6;
+        ctx.stroke();
+      });
+      // draw nodes
+      nodes.forEach(n => {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(77,159,255,0.7)';
+        ctx.fill();
+        // outer ring
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r+3, 0, Math.PI*2);
+        ctx.strokeStyle = 'rgba(26,111,255,0.3)';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+      });
+      // draw pulses
+      pulses.forEach(p => {
+        p.t += p.speed;
+        if (p.t > 1) p.t = 0;
+        const a = nodes[p.conn.a], b = nodes[p.conn.b];
+        const x = a.x + (b.x - a.x) * p.t;
+        const y = a.y + (b.y - a.y) * p.t;
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI*2);
+        ctx.fillStyle = p.col;
+        ctx.shadowColor = p.col;
+        ctx.shadowBlur = 8;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      });
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  /* ── POPUP ── */
+  function grantTheA() {
+    document.getElementById('popup').classList.add('active');
+    spawnConfetti();
+  }
+
+  function closePopup() {
+    document.getElementById('popup').classList.remove('active');
+  }
+
+  document.getElementById('popup').addEventListener('click', function(e) {
+    if (e.target === this) closePopup();
+  });
+
+  /* ── CONFETTI ── */
+  function spawnConfetti() {
+    const colors = ['#1a6fff','#00e5ff','#ffffff','#ffd700','#4d9fff'];
+    for (let i=0; i<60; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `
+        left: ${Math.random()*100}vw;
+        top: -10px;
+        background: ${colors[Math.floor(Math.random()*colors.length)]};
+        width: ${4+Math.random()*8}px;
+        height: ${4+Math.random()*8}px;
+        border-radius: ${Math.random()>0.5?'50%':'2px'};
+        animation-duration: ${1.5+Math.random()*2}s;
+        animation-delay: ${Math.random()*0.5}s;
+      `;
+      document.body.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }
+  }
+
+  /* ── SCROLL REVEAL ── */
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(r => observer.observe(r));
+</script>
+
+</body>
+</html>
