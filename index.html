@@ -439,6 +439,118 @@ font-size: 1rem;
 flex-shrink: 0;
 }
 
+/* ── HUGE IN HIGH SCHOOL ── */
+#hihs {
+background: #03050f !important;
+}
+
+.hihs-hero {
+background: linear-gradient(135deg, rgba(26,111,255,0.1) 0%, rgba(0,229,255,0.06) 100%);
+border: 1px solid var(–border);
+border-radius: 12px;
+padding: 44px;
+margin-bottom: 32px;
+position: relative;
+overflow: hidden;
+}
+
+.hihs-hero::after {
+content: ‘HUGE’;
+position: absolute;
+right: -10px;
+top: 50%;
+transform: translateY(-50%);
+font-family: ‘Syne’, sans-serif;
+font-size: 9rem;
+font-weight: 900;
+color: rgba(26,111,255,0.06);
+line-height: 1;
+pointer-events: none;
+letter-spacing: -0.05em;
+}
+
+.hihs-badge {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+background: rgba(0,229,255,0.1);
+border: 1px solid rgba(0,229,255,0.3);
+border-radius: 20px;
+padding: 6px 14px;
+font-family: ‘Space Mono’, monospace;
+font-size: 0.7rem;
+color: var(–cyan);
+letter-spacing: 0.1em;
+text-transform: uppercase;
+margin-bottom: 20px;
+}
+
+.merch-grid {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 14px;
+margin-top: 32px;
+}
+
+@media (max-width: 600px) { .merch-grid { grid-template-columns: 1fr; } }
+
+.merch-card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 8px;
+padding: 24px 20px;
+text-align: center;
+transition: border-color 0.3s, transform 0.3s;
+}
+
+.merch-card:hover {
+border-color: var(–cyan);
+transform: translateY(-5px);
+}
+
+.merch-emoji {
+font-size: 2.2rem;
+display: block;
+margin-bottom: 12px;
+}
+
+.merch-card strong {
+display: block;
+font-family: ‘Syne’, sans-serif;
+font-size: 0.95rem;
+font-weight: 700;
+color: var(–white);
+margin-bottom: 6px;
+}
+
+.merch-card span {
+color: var(–muted);
+font-size: 0.82rem;
+line-height: 1.5;
+}
+
+.btn-merch {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+margin-top: 36px;
+padding: 14px 32px;
+background: transparent;
+border: 1px solid var(–cyan);
+color: var(–cyan);
+font-family: ‘Syne’, sans-serif;
+font-size: 0.95rem;
+font-weight: 700;
+border-radius: 4px;
+text-decoration: none;
+transition: background 0.3s, color 0.3s;
+}
+
+.btn-merch:hover {
+background: var(–cyan);
+color: #03050f;
+}
+
 /* ── QUOTE ── */
 #quote {
 text-align: center;
@@ -658,7 +770,7 @@ to   { transform: translateY(100vh) rotate(720deg); opacity: 0; }
       <p>Learning to use AI responsibly is one of the most important skills for the future. It's not about replacing thinking — it's about working <strong>smarter, faster, and more creatively</strong>. That's exactly what this project tried to do.</p>
     </div>
     <div class="ai-terminal reveal">
-      <div class="ai-line"><span class="prompt">›</span><span class="cmd">analyze_student --name "Your Student" --course current</span></div>
+      <div class="ai-line"><span class="prompt">›</span><span class="cmd">analyze_student --name "DYLAN JARJOSA" --course current</span></div>
       <div class="ai-line"><span class="prompt">›</span><span class="output">Effort score: 94.7%  ████████████████░░</span></div>
       <div class="ai-line"><span class="prompt">›</span><span class="output">Creativity index: HIGH  🎨</span></div>
       <div class="ai-line"><span class="prompt">›</span><span class="output">AI fluency: Demonstrated  🤖</span></div>
@@ -673,7 +785,7 @@ to   { transform: translateY(100vh) rotate(720deg); opacity: 0; }
 <section id="goals">
   <div class="container">
     <div class="reveal">
-      <p class="section-tag">04 · Future Goals</p>
+      <p class="section-tag">06 · Future Goals</p>
       <h2>Where I'm <span class="accent">headed next.</span></h2>
       <p>This class isn't just a grade — it's groundwork. Here's where the lessons are leading:</p>
     </div>
@@ -695,6 +807,58 @@ to   { transform: translateY(100vh) rotate(720deg); opacity: 0; }
         Apply everything learned in this class to actual, real-life situations — not just tests.
       </li>
     </ul>
+  </div>
+</section>
+
+<!-- ════ SECTION 5: HUGE IN HIGH SCHOOL ════ -->
+
+<section id="hihs">
+  <div class="container">
+    <div class="reveal">
+      <p class="section-tag">05 · Fan Moment</p>
+      <h2>Huge in High School is <span class="accent">genuinely fire.</span></h2>
+    </div>
+
+```
+<div class="hihs-hero reveal">
+  <div class="hihs-badge">🏋️ Student-Approved Brand</div>
+  <p>Let's be real — most teachers just teach. Mr. Schop built an entire brand. <strong>Huge in High School</strong> is a fitness and lifestyle brand built around the idea that you don't need expensive equipment, supplements, or gym memberships to get strong. You just need to trust yourself and put in the work. That message hits different when it comes from someone who's also standing in front of a classroom every day.</p>
+  <p>The book lays it all out — honest, no-hype advice on weightlifting, mindset, and building good habits as a young person. It's the kind of thing that actually stays with you. And then there's the merch, which honestly just makes the whole thing feel real. When a teacher builds something from scratch with their own name on it, that's entrepreneurship. That's the stuff they usually only talk about in class — Mr. Schop actually did it.</p>
+</div>
+
+<div class="reveal">
+  <p class="section-tag" style="margin-top: 8px;">The Merch Breakdown</p>
+  <h2 style="font-size: 1.5rem; margin-bottom: 8px;">Why I'd Actually Wear This 🧢</h2>
+  <p>The Huge in High School merch isn't just "teacher merch." It's clean, it means something, and wearing it is lowkey a flex because most people won't even know what it is.</p>
+</div>
+
+<div class="merch-grid">
+  <div class="merch-card reveal">
+    <span class="merch-emoji">👕</span>
+    <strong>The Tees</strong>
+    <span>Simple, clean graphic tees you'd actually wear outside the house. Not just something you wear to mow the lawn.</span>
+  </div>
+  <div class="merch-card reveal">
+    <span class="merch-emoji">🧥</span>
+    <strong>The Hoodies</strong>
+    <span>Comfortable, quality hoodies with the HIHS branding. Perfect for early morning workouts or just looking put-together.</span>
+  </div>
+  <div class="merch-card reveal">
+    <span class="merch-emoji">🧢</span>
+    <strong>The Hats</strong>
+    <span>A clean cap that pairs with literally anything. Understated enough that it works, bold enough that people ask about it.</span>
+  </div>
+</div>
+
+<div style="text-align: center;" class="reveal">
+  <p style="margin-top: 28px; color: var(--muted);">Supporting the brand is supporting the mindset. And honestly, the merch is good enough to stand on its own.</p>
+  <a class="btn-merch" href="https://inkpressions.chipply.com/hugeinhighschool/" target="_blank">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+    Shop the Merch →
+  </a>
+</div>
+```
+
   </div>
 </section>
 
